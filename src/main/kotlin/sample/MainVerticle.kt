@@ -27,6 +27,8 @@ import io.vertx.reactivex.ext.jdbc.JDBCClient
 import io.vertx.reactivex.ext.sql.SQLConnection
 import io.vertx.reactivex.ext.web.Router
 import io.vertx.reactivex.ext.web.RoutingContext
+import io.vertx.reactivex.ext.web.handler.LoggerHandler
+import io.vertx.reactivex.ext.web.handler.StaticHandler
 
 
 /**
@@ -56,7 +58,9 @@ class MainVerticle : AbstractVerticle() {
 
   private fun setupHttpServer(jdbcClient: JDBCClient): Single<HttpServer> {
     val router = Router.router(vertx)
+    router.route().handler(LoggerHandler.create())
     router.get("/music.json").handler { routingContext -> listTracks(routingContext, jdbcClient) }
+    router.get().handler(StaticHandler.create())
     return vertx.createHttpServer()
       .requestHandler(router::accept)
       .rxListen(8080)

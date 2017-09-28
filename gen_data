@@ -2,13 +2,15 @@
 
 set -e
 
-OUTPUT=src/main/resources/import.sql
+OUTPUT=$(readlink -f src/main/resources/import.sql)
 
 rm -f $OUTPUT
 
 function get_info {
   mediainfo $1 | grep -F "$2" | cut -d ':' -f2 | awk '{$1=$1;print}' | head -n 1
 }
+
+cd src/main/resources/webroot
 
 ls media/*.mp3 | while read file; do
   TITLE=$(get_info $file "Track name")
