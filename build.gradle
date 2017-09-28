@@ -30,6 +30,7 @@ dependencies {
   compile 'io.vertx:vertx-lang-kotlin'
   compile 'io.vertx:vertx-rx-java2'
   compile 'io.vertx:vertx-jdbc-client'
+  compile 'io.vertx:vertx-web'
   compile 'com.h2database:h2:1.4.196'
 }
 

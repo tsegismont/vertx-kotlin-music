@@ -18,10 +18,15 @@ package sample
 
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.core.json.JsonObject
 import io.vertx.reactivex.core.AbstractVerticle
+import io.vertx.reactivex.core.buffer.Buffer
+import io.vertx.reactivex.core.http.HttpServer
 import io.vertx.reactivex.ext.jdbc.JDBCClient
 import io.vertx.reactivex.ext.sql.SQLConnection
+import io.vertx.reactivex.ext.web.Router
+import io.vertx.reactivex.ext.web.RoutingContext
 
 
 /**
@@ -31,7 +36,7 @@ class MainVerticle : AbstractVerticle() {
 
   override fun start() {
     val config = JsonObject(
-      "url" to "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+      "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
       "driver_class" to "org.h2.Driver"
     )
 
@@ -39,13 +44,40 @@ class MainVerticle : AbstractVerticle() {
 
     runScript(jdbcClient, "classpath:db.sql")
       .andThen(runScript(jdbcClient, "classpath:import.sql"))
-      .subscribe({ println("Started!") }, { t -> println(t) })
+      .andThen(setupHttpServer(jdbcClient))
+      .subscribe({ println("Started!") }, Throwable::printStackTrace)
   }
 
   private fun runScript(jdbcClient: JDBCClient, script: String): Completable {
     return getConnection(jdbcClient).flatMapCompletable { sqlConnection ->
       sqlConnection.rxExecute("RUNSCRIPT FROM '$script'")
     }
+  }
+
+  private fun setupHttpServer(jdbcClient: JDBCClient): Single<HttpServer> {
+    val router = Router.router(vertx)
+    router.get("/music.json").handler { routingContext -> listTracks(routingContext, jdbcClient) }
+    return vertx.createHttpServer()
+      .requestHandler(router::accept)
+      .rxListen(8080)
+  }
+
+  private fun listTracks(routingContext: RoutingContext, jdbcClient: JDBCClient) {
+    getConnection(jdbcClient)
+      .flatMap { it.rxQuery("SELECT title,album,artist,genre,source,duration FROM tracks") }
+      .map { toMusicJson(it.rows) }
+      .subscribe({
+        routingContext.response().putHeader("Content-Type", "application/json").end(Buffer(it.toBuffer()))
+      }, routingContext::fail)
+  }
+
+  private fun toMusicJson(rows: List<JsonObject>): JsonObject {
+    val tracks = rows.onEach {
+      it.put("image", "img/vertx.jpg")
+        .put("trackNumber", 0)
+        .put("totalTrackCount", 0)
+    }
+    return JsonObject("music" to tracks)
   }
 
   private fun getConnection(jdbcClient: JDBCClient): Single<SQLConnection> {
