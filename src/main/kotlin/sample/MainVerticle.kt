@@ -16,7 +16,13 @@
 
 package sample
 
-import io.vertx.core.AbstractVerticle
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.vertx.kotlin.core.json.JsonObject
+import io.vertx.reactivex.core.AbstractVerticle
+import io.vertx.reactivex.ext.jdbc.JDBCClient
+import io.vertx.reactivex.ext.sql.SQLConnection
+
 
 /**
  * @author Thomas Segismont
@@ -24,6 +30,27 @@ import io.vertx.core.AbstractVerticle
 class MainVerticle : AbstractVerticle() {
 
   override fun start() {
-    println("bimbdsq!!!!!")
+    val config = JsonObject(
+      "url" to "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
+      "driver_class" to "org.h2.Driver"
+    )
+
+    val jdbcClient = JDBCClient.createShared(vertx, config)
+
+    runScript(jdbcClient, "classpath:db.sql")
+      .andThen(runScript(jdbcClient, "classpath:import.sql"))
+      .subscribe({ println("Started!") }, { t -> println(t) })
+  }
+
+  private fun runScript(jdbcClient: JDBCClient, script: String): Completable {
+    return getConnection(jdbcClient).flatMapCompletable { sqlConnection ->
+      sqlConnection.rxExecute("RUNSCRIPT FROM '$script'")
+    }
+  }
+
+  private fun getConnection(jdbcClient: JDBCClient): Single<SQLConnection> {
+    return jdbcClient.rxGetConnection().flatMap { sqlConnection ->
+      Single.just(sqlConnection).doAfterTerminate(sqlConnection::close)
+    }
   }
 }

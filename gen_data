@@ -18,5 +18,5 @@ ls media/*.mp3 | while read file; do
   SOURCE=$(get_info $file "Complete name")
   DURATION=$(date -d"1970-01-01 00:00:00 UTC $(get_info $file "Duration" | sed -e 's/ min / minutes /g' | sed -e 's/ s/ seconds/g')" "+%s")
 
-  echo "INSERT INTO tracks (title,album,artist,genre,source,duration) VALUES ('$TITLE', '$ALBUM', '$ARTIST', '$GENRE', '$SOURCE', $DURATION)" >> $OUTPUT
+  echo "INSERT INTO tracks (title,album,artist,genre,source,duration) VALUES ('$TITLE', '$ALBUM', '$ARTIST', '$GENRE', '$SOURCE', $DURATION);" >> $OUTPUT
 done

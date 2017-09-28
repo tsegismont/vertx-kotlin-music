@@ -21,16 +21,21 @@ plugins {
 
 repositories {
   jcenter()
+  mavenCentral()
+  mavenLocal()
 }
 
 dependencies {
-  compile 'io.vertx:vertx-lang-kotlin'
   compile 'org.jetbrains.kotlin:kotlin-stdlib-jre8'
+  compile 'io.vertx:vertx-lang-kotlin'
+  compile 'io.vertx:vertx-rx-java2'
+  compile 'io.vertx:vertx-jdbc-client'
+  compile 'com.h2database:h2:1.4.196'
 }
 
 vertx {
   mainVerticle = 'sample.MainVerticle'
-  vertxVersion = '3.5.0.Beta1'
+  vertxVersion = '3.5.0-SNAPSHOT'
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

@@ -4,3 +4,4 @@
 .gradle
 .vertx
 build
+out/
