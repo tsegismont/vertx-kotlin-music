@@ -5,9 +5,9 @@ import io.vertx.core.AbstractVerticle
 /**
  * @author Thomas Segismont
  */
-class MainVerticle: AbstractVerticle() {
+class MainVerticle : AbstractVerticle() {
 
-    override fun start() {
-        println("bimbdsq!!!!!")
-    }
+  override fun start() {
+    println("bimbdsq!!!!!")
+  }
 }
