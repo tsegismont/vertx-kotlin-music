@@ -20,6 +20,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.core.json.JsonObject
+import io.vertx.kotlin.core.json.array
+import io.vertx.kotlin.core.json.json
+import io.vertx.kotlin.core.json.obj
 import io.vertx.reactivex.core.AbstractVerticle
 import io.vertx.reactivex.core.buffer.Buffer
 import io.vertx.reactivex.core.http.HttpServer
@@ -76,11 +79,17 @@ class MainVerticle : AbstractVerticle() {
   }
 
   private fun toMusicJson(rows: List<JsonObject>): JsonObject {
-    val tracks = rows.onEach {
-      it.put("trackNumber", 0)
-        .put("totalTrackCount", 0)
+    return json {
+      obj(
+        "music" to json {
+          array(
+            rows.onEach {
+              it.put("trackNumber", 0)
+                .put("totalTrackCount", 0)
+            }
+          )
+        })
     }
-    return JsonObject("music" to tracks)
   }
 
   private fun getConnection(jdbcClient: JDBCClient): Single<SQLConnection> {
