@@ -2,7 +2,12 @@
 
 A server-side Vert.x Kotlin demo application.
 
-It serves as a backend for the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample].
+It serves as a backend for the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample] and shows how to:
+
+* create a web server
+* interact with a relational database
+* transform data streams with https://github.com/ReactiveX/RxJava[RxJava]
+* stream files from the disk
 
 == Running
 
