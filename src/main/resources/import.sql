@@ -1,3 +1,5 @@
+INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Behind Closed Doors','YouTube Audio Library','Otis McDonald','Hip Hop & Rap','media/Behind_Closed_Doors.mp3', 128, 'img/vert_x.jpg');
+INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Biggie','YouTube Audio Library','ALBIS','Jazz & Blues','media/Biggie.mp3', 133, 'img/kotlin.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('C Major Prelude','YouTube Audio Library','Bach','Classical','media/C_Major_Prelude.mp3', 133, 'img/vert_x.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Come On In','YouTube Audio Library','Silent Partner','Reggae','media/Come_On_In.mp3', 156, 'img/kotlin.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Eine Kleine Nachtmusik (by Mozart)','YouTube Audio Library','Mozart','Classical','media/Eine_Kleine_Nachtmusik_by_Mozart.mp3', 351, 'img/vert_x.jpg');
@@ -5,5 +7,9 @@ INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Kis
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Morning Mood (by Grieg)','YouTube Audio Library','Grieg','Classical','media/Morning_Mood_by_Grieg.mp3', 222, 'img/vert_x.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Natty Roadster','YouTube Audio Library','JR Tundra','Reggae','media/Natty_Roadster.mp3', 182, 'img/kotlin.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Orange Blanket','YouTube Audio Library','Jingle Punks','Rock','media/Orange_Blanket.mp3', 74, 'img/vert_x.jpg');
+INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Other Way','YouTube Audio Library','Otis McDonald','Hip Hop & Rap','media/Other_Way.mp3', 114, 'img/kotlin.jpg');
+INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Pina Colada','YouTube Audio Library','Silent Partner','Jazz & Blues','media/Pina_Colada.mp3', 130, 'img/vert_x.jpg');
+INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Raw Deal','YouTube Audio Library','Gunnar Olsen','Hip Hop & Rap','media/Raw_Deal.mp3', 168, 'img/kotlin.jpg');
+INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('The Big Score','YouTube Audio Library','MK2','Jazz & Blues','media/The_Big_Score.mp3', 105, 'img/vert_x.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Winter Embrace','YouTube Audio Library','Silent Partner','Rock','media/Winter_Embrace.mp3', 138, 'img/kotlin.jpg');
 INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('Wobble Theory','YouTube Audio Library','Silent Partner','Rock','media/Wobble_Theory.mp3', 130, 'img/vert_x.jpg');
