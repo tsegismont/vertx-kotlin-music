@@ -1,0 +1,33 @@
+= Vert.x Kotlin Music
+
+A server-side Vert.x Kotlin demo application.
+
+It serves as a backend for the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample].
+
+== Running
+
+=== The server-side app
+
+Download or fork this repository, open it in a terminal and then run:
+
+[source,bash]
+----
+./gradlew vertxRun
+----
+
+The server starts listening on port `8080`.
+
+=== The mobile app
+
+The easiest way to run the mobile app is to start it in an emulator.
+
+Open https://developer.android.com/studio/index.html[Android Studio] and import the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample].
+
+In `mobile/src/main/java/com/example/android/uamp/model/RemoteJSONSource.java`, change the `CATALOG_URL` to `http://10.0.2.2:8080/music.json`.footnote:[`10.0.2.2` is a special IP address that the emulator uses to communicate with the host through its loopback interface.]
+
+Eventually, https://developer.android.com/studio/run/managing-avds.html[create or reuse a virtual device] to deploy.
+
+== Audio files
+
+Audio files in this repository come the https://www.youtube.com/audiolibrary/music[YoutTube Free Music Library].
+They have been chosen because they do not require paternity attribution.
