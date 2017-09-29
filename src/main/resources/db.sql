@@ -6,5 +6,6 @@ CREATE TABLE tracks
   artist   VARCHAR                           NOT NULL,
   genre    VARCHAR                           NOT NULL,
   source   VARCHAR                           NOT NULL,
-  duration INT                               NOT NULL
+  duration INT                               NOT NULL,
+  image    VARCHAR                           NOT NULL
 );

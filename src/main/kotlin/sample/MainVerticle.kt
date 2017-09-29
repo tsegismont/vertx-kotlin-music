@@ -68,7 +68,7 @@ class MainVerticle : AbstractVerticle() {
 
   private fun listTracks(routingContext: RoutingContext, jdbcClient: JDBCClient) {
     getConnection(jdbcClient)
-      .flatMap { it.rxQuery("SELECT title,album,artist,genre,source,duration FROM tracks") }
+      .flatMap { it.rxQuery("SELECT title,album,artist,genre,source,duration,image FROM tracks") }
       .map { toMusicJson(it.rows) }
       .subscribe({
         routingContext.response().putHeader("Content-Type", "application/json").end(Buffer(it.toBuffer()))
@@ -77,8 +77,7 @@ class MainVerticle : AbstractVerticle() {
 
   private fun toMusicJson(rows: List<JsonObject>): JsonObject {
     val tracks = rows.onEach {
-      it.put("image", "img/vertx.jpg")
-        .put("trackNumber", 0)
+      it.put("trackNumber", 0)
         .put("totalTrackCount", 0)
     }
     return JsonObject("music" to tracks)

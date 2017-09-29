@@ -12,6 +12,7 @@ function get_info {
 
 cd src/main/resources/webroot
 
+i=0
 ls media/*.mp3 | while read file; do
   TITLE=$(get_info $file "Track name")
   ALBUM=$(get_info $file "Album")
@@ -19,6 +20,9 @@ ls media/*.mp3 | while read file; do
   GENRE=$(get_info $file "Genre")
   SOURCE=$(get_info $file "Complete name")
   DURATION=$(date -d"1970-01-01 00:00:00 UTC $(get_info $file "Duration" | sed -e 's/ min / minutes /g' | sed -e 's/ s/ seconds/g')" "+%s")
+  if (( $i % 2 == 0 )); then IMAGE="img/vert_x.jpg"; else IMAGE="img/kotlin.jpg"; fi
 
-  echo "INSERT INTO tracks (title,album,artist,genre,source,duration) VALUES ('$TITLE', '$ALBUM', '$ARTIST', '$GENRE', '$SOURCE', $DURATION);" >> $OUTPUT
+  echo "INSERT INTO tracks (title,album,artist,genre,source,duration,image) VALUES ('$TITLE','$ALBUM','$ARTIST','$GENRE','$SOURCE', $DURATION, '$IMAGE');" >> $OUTPUT
+
+  i=$((i+1))
 done
