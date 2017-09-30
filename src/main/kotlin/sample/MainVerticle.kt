@@ -39,37 +39,39 @@ import io.vertx.reactivex.ext.web.handler.StaticHandler
  */
 class MainVerticle : AbstractVerticle() {
 
+  lateinit var jdbcClient: JDBCClient
+
   override fun start() {
     val config = JsonObject(
       "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
       "driver_class" to "org.h2.Driver"
     )
 
-    val jdbcClient = JDBCClient.createShared(vertx, config)
+    jdbcClient = JDBCClient.createShared(vertx, config)
 
-    runScript(jdbcClient, "classpath:db.sql")
-      .andThen(runScript(jdbcClient, "classpath:import.sql"))
-      .andThen(setupHttpServer(jdbcClient))
+    runScript("classpath:db.sql")
+      .andThen(runScript("classpath:import.sql"))
+      .andThen(setupHttpServer())
       .subscribe({ println("Started!") }, Throwable::printStackTrace)
   }
 
-  private fun runScript(jdbcClient: JDBCClient, script: String): Completable {
+  private fun runScript(script: String): Completable {
     return getConnection(jdbcClient).flatMapCompletable { sqlConnection ->
       sqlConnection.rxExecute("RUNSCRIPT FROM '$script'")
     }
   }
 
-  private fun setupHttpServer(jdbcClient: JDBCClient): Single<HttpServer> {
+  private fun setupHttpServer(): Single<HttpServer> {
     val router = Router.router(vertx)
     router.route().handler(LoggerHandler.create())
-    router.get("/music.json").handler { routingContext -> listTracks(routingContext, jdbcClient) }
+    router.get("/music.json").handler { routingContext -> listTracks(routingContext) }
     router.get().handler(StaticHandler.create())
     return vertx.createHttpServer()
       .requestHandler(router::accept)
       .rxListen(8080)
   }
 
-  private fun listTracks(routingContext: RoutingContext, jdbcClient: JDBCClient) {
+  private fun listTracks(routingContext: RoutingContext) {
     getConnection(jdbcClient)
       .flatMap { it.rxQuery("SELECT title,album,artist,genre,source,duration,image FROM tracks") }
       .map { toMusicJson(it.rows) }
