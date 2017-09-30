@@ -55,11 +55,10 @@ class MainVerticle : AbstractVerticle() {
       .subscribe({ println("Started!") }, Throwable::printStackTrace)
   }
 
-  private fun runScript(script: String): Completable {
-    return getConnection(jdbcClient).flatMapCompletable { sqlConnection ->
+  private fun runScript(script: String): Completable =
+    getConnection(jdbcClient).flatMapCompletable { sqlConnection ->
       sqlConnection.rxExecute("RUNSCRIPT FROM '$script'")
     }
-  }
 
   private fun setupHttpServer(): Single<HttpServer> {
     val router = Router.router(vertx)
@@ -80,23 +79,20 @@ class MainVerticle : AbstractVerticle() {
       }, routingContext::fail)
   }
 
-  private fun toMusicJson(rows: List<JsonObject>): JsonObject {
-    return json {
-      obj(
-        "music" to json {
-          array(
-            rows.onEach {
-              it.put("trackNumber", 0)
-                .put("totalTrackCount", 0)
-            }
-          )
-        })
-    }
+  private fun toMusicJson(rows: List<JsonObject>): JsonObject = json {
+    obj(
+      "music" to json {
+        array(
+          rows.onEach {
+            it.put("trackNumber", 0)
+              .put("totalTrackCount", 0)
+          }
+        )
+      })
   }
 
-  private fun getConnection(jdbcClient: JDBCClient): Single<SQLConnection> {
-    return jdbcClient.rxGetConnection().flatMap { sqlConnection ->
+  private fun getConnection(jdbcClient: JDBCClient): Single<SQLConnection> =
+    jdbcClient.rxGetConnection().flatMap { sqlConnection ->
       Single.just(sqlConnection).doAfterTerminate(sqlConnection::close)
     }
-  }
 }
