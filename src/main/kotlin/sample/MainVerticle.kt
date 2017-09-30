@@ -19,7 +19,6 @@ package sample
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.vertx.core.json.JsonObject
-import io.vertx.kotlin.core.json.JsonObject
 import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
@@ -42,10 +41,12 @@ class MainVerticle : AbstractVerticle() {
   lateinit var jdbcClient: JDBCClient
 
   override fun start() {
-    val config = JsonObject(
-      "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
-      "driver_class" to "org.h2.Driver"
-    )
+    val config = json {
+      obj(
+        "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
+        "driver_class" to "org.h2.Driver"
+      )
+    }
 
     jdbcClient = JDBCClient.createShared(vertx, config)
 
