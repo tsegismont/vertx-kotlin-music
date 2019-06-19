@@ -19,7 +19,7 @@ dependencies {
 }
 
 vertx {
-  vertxVersion = "3.5.1"
+  vertxVersion = "3.7.1"
   mainVerticle = "sample.MainVerticle"
 }
 

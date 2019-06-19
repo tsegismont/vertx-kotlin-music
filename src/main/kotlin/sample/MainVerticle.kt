@@ -38,9 +38,9 @@ import io.vertx.reactivex.ext.web.handler.StaticHandler
  */
 class MainVerticle : AbstractVerticle() {
 
-  lateinit var jdbcClient: JDBCClient
+  private lateinit var jdbcClient: JDBCClient
 
-  override fun start() {
+  override fun rxStart(): Completable {
     val config = json {
       obj(
         "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
@@ -50,10 +50,11 @@ class MainVerticle : AbstractVerticle() {
 
     jdbcClient = JDBCClient.createShared(vertx, config)
 
-    runScript("classpath:db.sql")
+    return runScript("classpath:db.sql")
       .andThen(runScript("classpath:import.sql"))
       .andThen(setupHttpServer())
-      .subscribe({ println("Started!") }, Throwable::printStackTrace)
+      .ignoreElement()
+      .doOnComplete { println("Started!") }
   }
 
   private fun runScript(script: String): Completable =
@@ -67,7 +68,7 @@ class MainVerticle : AbstractVerticle() {
     router.get("/music.json").handler { routingContext -> listTracks(routingContext) }
     router.get().handler(StaticHandler.create())
     return vertx.createHttpServer()
-      .requestHandler(router::accept)
+      .requestHandler(router)
       .rxListen(8080)
   }
 
