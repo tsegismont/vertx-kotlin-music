@@ -16,31 +16,32 @@
 
 package sample
 
-import io.reactivex.Completable
-import io.reactivex.Single
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.jdbc.JDBCClient
+import io.vertx.ext.sql.ResultSet
+import io.vertx.ext.web.Router
+import io.vertx.ext.web.RoutingContext
+import io.vertx.ext.web.handler.LoggerHandler
+import io.vertx.ext.web.handler.StaticHandler
+import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
-import io.vertx.reactivex.core.AbstractVerticle
-import io.vertx.reactivex.core.buffer.Buffer
-import io.vertx.reactivex.core.http.HttpServer
-import io.vertx.reactivex.ext.jdbc.JDBCClient
-import io.vertx.reactivex.ext.sql.SQLConnection
-import io.vertx.reactivex.ext.web.Router
-import io.vertx.reactivex.ext.web.RoutingContext
-import io.vertx.reactivex.ext.web.handler.LoggerHandler
-import io.vertx.reactivex.ext.web.handler.StaticHandler
+import io.vertx.kotlin.coroutines.CoroutineVerticle
+import io.vertx.kotlin.ext.sql.executeAwait
+import io.vertx.kotlin.ext.sql.getConnectionAwait
+import io.vertx.reactivex.ext.jdbc.JDBCClient as RxJDBCClient
 
 
 /**
  * @author Thomas Segismont
  */
-class App : AbstractVerticle() {
+class App : CoroutineVerticle() {
 
   private lateinit var jdbcClient: JDBCClient
+  private lateinit var rxJdbcClient: RxJDBCClient
 
-  override fun rxStart(): Completable {
+  override suspend fun start() {
     val config = json {
       obj(
         "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
@@ -49,34 +50,34 @@ class App : AbstractVerticle() {
     }
 
     jdbcClient = JDBCClient.createShared(vertx, config)
+    rxJdbcClient = RxJDBCClient.newInstance(jdbcClient)
 
-    return runScript("classpath:db.sql")
-      .andThen(runScript("classpath:import.sql"))
-      .andThen(setupHttpServer())
-      .ignoreElement()
+    runScript("classpath:db.sql")
+    runScript("classpath:import.sql")
+    setupHttpServer()
   }
 
-  private fun runScript(script: String): Completable =
-    getConnection(jdbcClient).flatMapCompletable { sqlConnection ->
-      sqlConnection.rxExecute("RUNSCRIPT FROM '$script'")
-    }
+  private suspend fun runScript(script: String) =
+    jdbcClient.getConnectionAwait().executeAwait("RUNSCRIPT FROM '$script'")
 
-  private fun setupHttpServer(): Single<HttpServer> {
+
+  private suspend fun setupHttpServer() {
     val router = Router.router(vertx)
     router.route().handler(LoggerHandler.create())
     router.get("/music.json").handler { routingContext -> listTracks(routingContext) }
     router.get().handler(StaticHandler.create())
-    return vertx.createHttpServer()
+    vertx.createHttpServer()
       .requestHandler(router)
-      .rxListen(8080)
+      .listenAwait(8080)
   }
 
   private fun listTracks(routingContext: RoutingContext) {
-    getConnection(jdbcClient)
-      .flatMap { it.rxQuery("SELECT title,album,artist,genre,source,duration,image FROM tracks") }
-      .map { toMusicJson(it.rows) }
-      .subscribe({
-        routingContext.response().putHeader("Content-Type", "application/json").end(Buffer(it.toBuffer()))
+    rxJdbcClient.rxQuery("SELECT title,album,artist,genre,source,duration,image FROM tracks")
+      .map(ResultSet::getRows)
+      .map(this::toMusicJson)
+      .map(JsonObject::encode)
+      .subscribe({ json ->
+        routingContext.response().putHeader("Content-Type", "application/json").end(json)
       }, routingContext::fail)
   }
 
@@ -91,9 +92,4 @@ class App : AbstractVerticle() {
         )
       })
   }
-
-  private fun getConnection(jdbcClient: JDBCClient): Single<SQLConnection> =
-    jdbcClient.rxGetConnection().flatMap { sqlConnection ->
-      Single.just(sqlConnection).doAfterTerminate(sqlConnection::close)
-    }
 }

@@ -11,8 +11,10 @@ repositories {
 
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.2.2")
 
   implementation("io.vertx:vertx-lang-kotlin")
+  implementation("io.vertx:vertx-lang-kotlin-coroutines")
   implementation("io.vertx:vertx-rx-java2")
   implementation("io.vertx:vertx-jdbc-client")
   implementation("io.vertx:vertx-web")
