@@ -36,7 +36,7 @@ import io.vertx.reactivex.ext.web.handler.StaticHandler
 /**
  * @author Thomas Segismont
  */
-class MainVerticle : AbstractVerticle() {
+class App : AbstractVerticle() {
 
   private lateinit var jdbcClient: JDBCClient
 
@@ -54,7 +54,6 @@ class MainVerticle : AbstractVerticle() {
       .andThen(runScript("classpath:import.sql"))
       .andThen(setupHttpServer())
       .ignoreElement()
-      .doOnComplete { println("Started!") }
   }
 
   private fun runScript(script: String): Completable =
