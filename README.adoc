@@ -11,6 +11,17 @@ It serves as a backend for the https://github.com/googlesamples/android-Universa
 
 == Running
 
+=== The Postgres database
+
+With Docker:
+
+[source,bash]
+----
+cd postgres
+docker build -t vertx-kotlin-music/postgres .
+docker run --network host -it vertx-kotlin-music/postgres
+----
+
 === The server-side app
 
 Download or fork this repository, open it in a terminal and then run:

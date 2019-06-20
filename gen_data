@@ -2,7 +2,7 @@
 
 set -e
 
-OUTPUT=$(readlink -f src/main/resources/import.sql)
+OUTPUT=$(readlink -f postgres/scripts/99-import.sql)
 
 rm -f $OUTPUT
 

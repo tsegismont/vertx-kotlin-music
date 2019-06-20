@@ -16,21 +16,20 @@
 
 package sample
 
-import io.vertx.core.json.JsonObject
-import io.vertx.ext.jdbc.JDBCClient
-import io.vertx.ext.sql.ResultSet
+import io.reactiverse.kotlin.pgclient.pgPoolOptionsOf
+import io.reactiverse.kotlin.pgclient.queryAwait
+import io.reactiverse.pgclient.PgClient
+import io.reactiverse.pgclient.PgPool
+import io.reactiverse.pgclient.Row
+import io.vertx.core.json.JsonArray
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.LoggerHandler
 import io.vertx.ext.web.handler.StaticHandler
 import io.vertx.kotlin.core.http.listenAwait
-import io.vertx.kotlin.core.json.array
-import io.vertx.kotlin.core.json.json
-import io.vertx.kotlin.core.json.obj
+import io.vertx.kotlin.core.json.jsonObjectOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
-import io.vertx.kotlin.ext.sql.executeAwait
-import io.vertx.kotlin.ext.sql.getConnectionAwait
-import io.vertx.reactivex.ext.jdbc.JDBCClient as RxJDBCClient
+import kotlinx.coroutines.launch
 
 
 /**
@@ -38,58 +37,51 @@ import io.vertx.reactivex.ext.jdbc.JDBCClient as RxJDBCClient
  */
 class App : CoroutineVerticle() {
 
-  private lateinit var jdbcClient: JDBCClient
-  private lateinit var rxJdbcClient: RxJDBCClient
+  private lateinit var pgClient: PgPool
 
   override suspend fun start() {
-    val config = json {
-      obj(
-        "url" to "jdbc:h2:mem:test;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1",
-        "driver_class" to "org.h2.Driver"
-      )
-    }
-
-    jdbcClient = JDBCClient.createShared(vertx, config)
-    rxJdbcClient = RxJDBCClient.newInstance(jdbcClient)
-
-    runScript("classpath:db.sql")
-    runScript("classpath:import.sql")
+    val poolOptions = pgPoolOptionsOf(
+      port = config.getInteger("postgresPort", 5432),
+      user = "music", password = "music", database = "musicdb"
+    )
+    pgClient = PgClient.pool(vertx, poolOptions)
     setupHttpServer()
   }
-
-  private suspend fun runScript(script: String) =
-    jdbcClient.getConnectionAwait().executeAwait("RUNSCRIPT FROM '$script'")
-
 
   private suspend fun setupHttpServer() {
     val router = Router.router(vertx)
     router.route().handler(LoggerHandler.create())
-    router.get("/music.json").handler { routingContext -> listTracks(routingContext) }
+    router.get("/music.json").handler { routingContext -> launch { listTracks(routingContext) } }
     router.get().handler(StaticHandler.create())
     vertx.createHttpServer()
       .requestHandler(router)
       .listenAwait(8080)
   }
 
-  private fun listTracks(routingContext: RoutingContext) {
-    rxJdbcClient.rxQuery("SELECT title,album,artist,genre,source,duration,image FROM tracks")
-      .map(ResultSet::getRows)
-      .map(this::toMusicJson)
-      .map(JsonObject::encode)
-      .subscribe({ json ->
-        routingContext.response().putHeader("Content-Type", "application/json").end(json)
-      }, routingContext::fail)
+  private suspend fun listTracks(routingContext: RoutingContext) {
+    val pgRowSet = pgClient.queryAwait("SELECT title,album,artist,genre,source,duration,image FROM tracks")
+
+    val tracks = JsonArray()
+
+    pgRowSet.forEach {
+      val track = rowToJsonObject(it)
+      tracks.add(track)
+    }
+
+    val result = jsonObjectOf("music" to tracks).encode()
+
+    routingContext.response().putHeader("Content-Type", "application/json").end(result)
   }
 
-  private fun toMusicJson(rows: List<JsonObject>): JsonObject = json {
-    obj(
-      "music" to json {
-        array(
-          rows.onEach {
-            it.put("trackNumber", 0)
-              .put("totalTrackCount", 0)
-          }
-        )
-      })
-  }
+  private fun rowToJsonObject(row: Row) = jsonObjectOf(
+    "title" to row.getString("title"),
+    "album" to row.getString("album"),
+    "artist" to row.getString("artist"),
+    "genre" to row.getString("genre"),
+    "source" to row.getString("source"),
+    "duration" to row.getInteger("duration"),
+    "image" to row.getString("image"),
+    "trackNumber" to 0,
+    "totalTrackCount" to 0
+  )
 }

@@ -6,21 +6,34 @@ import io.vertx.ext.web.client.predicate.ResponsePredicate
 import io.vertx.ext.web.codec.BodyCodec
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
+import io.vertx.kotlin.core.deploymentOptionsOf
+import io.vertx.kotlin.core.json.jsonObjectOf
 import io.vertx.kotlin.ext.web.client.webClientOptionsOf
+import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.images.builder.ImageFromDockerfile
+import java.nio.file.Paths
 
 @ExtendWith(VertxExtension::class)
 internal class AppTest {
+
+  @Rule
+  var postgres: KGenericContainer = KGenericContainer(ImageFromDockerfile().withFileFromPath(".", Paths.get("postgres")))
+    .withExposedPorts(5432)
 
   private lateinit var webClient: WebClient
 
   @BeforeEach
   fun setUp(vertx: Vertx, testContext: VertxTestContext) {
-    vertx.deployVerticle(App(), testContext.succeeding {
+    postgres.start()
+
+    val config = jsonObjectOf("postgresPort" to postgres.firstMappedPort)
+    vertx.deployVerticle(App(), deploymentOptionsOf(config = config), testContext.succeeding {
       webClient = WebClient.create(vertx, webClientOptionsOf(defaultPort = 8080))
       testContext.completeNow()
     })
@@ -44,3 +57,5 @@ internal class AppTest {
       })
   }
 }
+
+class KGenericContainer(image: ImageFromDockerfile) : GenericContainer<KGenericContainer>(image)
