@@ -1,26 +1,8 @@
-/*
- * Copyright 2017 Red Hat, Inc.
- *
- * Red Hat licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-
 package sample
 
-import io.reactiverse.kotlin.pgclient.pgPoolOptionsOf
 import io.reactiverse.kotlin.pgclient.queryAwait
 import io.reactiverse.pgclient.PgClient
 import io.reactiverse.pgclient.PgPool
-import io.reactiverse.pgclient.Row
 import io.vertx.core.json.JsonArray
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
@@ -31,28 +13,19 @@ import io.vertx.kotlin.core.json.jsonObjectOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import kotlinx.coroutines.launch
 
-
-/**
- * @author Thomas Segismont
- */
 class App : CoroutineVerticle() {
 
   private lateinit var pgClient: PgPool
 
   override suspend fun start() {
-    val poolOptions = pgPoolOptionsOf(
-      port = config.getInteger("postgresPort", 5432),
-      user = "music", password = "music", database = "musicdb"
-    )
-    pgClient = PgClient.pool(vertx, poolOptions)
-    setupHttpServer()
-  }
+    pgClient = PgClient.pool(vertx, pgPoolOptions(config))
 
-  private suspend fun setupHttpServer() {
     val router = Router.router(vertx)
+
     router.route().handler(LoggerHandler.create())
     router.get("/music.json").handler { routingContext -> launch { listTracks(routingContext) } }
     router.get().handler(StaticHandler.create())
+
     vertx.createHttpServer()
       .requestHandler(router)
       .listenAwait(8080)
@@ -72,16 +45,4 @@ class App : CoroutineVerticle() {
 
     routingContext.response().putHeader("Content-Type", "application/json").end(result)
   }
-
-  private fun rowToJsonObject(row: Row) = jsonObjectOf(
-    "title" to row.getString("title"),
-    "album" to row.getString("album"),
-    "artist" to row.getString("artist"),
-    "genre" to row.getString("genre"),
-    "source" to row.getString("source"),
-    "duration" to row.getInteger("duration"),
-    "image" to row.getString("image"),
-    "trackNumber" to 0,
-    "totalTrackCount" to 0
-  )
 }
