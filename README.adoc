@@ -35,13 +35,20 @@ The server starts listening on port `8080`.
 
 === The mobile app
 
-The easiest way to run the mobile app is to start it in an emulator.
+Clone this https://github.com/tsegismont/android-UniversalMusicPlayer[fork] of the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample] and checkout the `vertx-kotlin-music` branch:
 
-Open https://developer.android.com/studio/index.html[Android Studio] and import the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample].
+[source,bash]
+----
+git clone https://github.com/tsegismont/android-UniversalMusicPlayer.git
+cd android-UniversalMusicPlayer
+git checkout vertx-kotlin-music
+----
 
-In `mobile/src/main/java/com/example/android/uamp/model/RemoteJSONSource.java`, change the `CATALOG_URL` to `http://10.0.2.2:8080/music.json`.footnote:[`10.0.2.2` is a special IP address that the emulator uses to communicate with the host through its loopback interface.]
+This branch modifies `mobile/src/main/java/com/example/android/uamp/model/RemoteJSONSource.java` so that the `CATALOG_URL` points to `http://10.0.2.2:8080/music.json`.footnote:[`10.0.2.2` is a special IP address that the emulator uses to communicate with the host through its loopback interface.]
 
-Eventually, https://developer.android.com/studio/run/managing-avds.html[create or reuse a virtual device] to deploy.
+Then open https://developer.android.com/studio/index.html[Android Studio] and import the project.
+
+Finally, https://developer.android.com/studio/run/managing-avds.html[create or reuse a virtual device] to deploy.
 
 == Audio files
 
