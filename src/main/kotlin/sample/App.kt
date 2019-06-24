@@ -41,8 +41,8 @@ class App : CoroutineVerticle() {
       tracks.add(track)
     }
 
-    val result = jsonObjectOf("music" to tracks).encode()
+    val result = jsonObjectOf("music" to tracks)
 
-    routingContext.response().putHeader("Content-Type", "application/json").end(result)
+    routingContext.json(result)
   }
 }

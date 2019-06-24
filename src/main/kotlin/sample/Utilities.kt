@@ -4,6 +4,7 @@ import io.reactiverse.kotlin.pgclient.pgPoolOptionsOf
 import io.reactiverse.pgclient.PgPoolOptions
 import io.reactiverse.pgclient.Row
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.jsonObjectOf
 
 internal fun pgPoolOptions(config: JsonObject): PgPoolOptions = pgPoolOptionsOf(
@@ -24,3 +25,6 @@ internal fun rowToJsonObject(row: Row) = jsonObjectOf(
   "trackNumber" to 0,
   "totalTrackCount" to 0
 )
+
+internal fun RoutingContext.json(json: JsonObject) =
+  this.response().putHeader("Content-Type", "application/json").end(json.encode())
