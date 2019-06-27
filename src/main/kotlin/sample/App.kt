@@ -32,7 +32,7 @@ class App : CoroutineVerticle() {
   }
 
   private suspend fun listTracks(routingContext: RoutingContext) {
-    val pgRowSet = pgClient.queryAwait("SELECT title,album,artist,genre,source,duration,image FROM tracks")
+    val pgRowSet = pgClient.queryAwait(query)
 
     val tracks = JsonArray()
 
@@ -44,5 +44,9 @@ class App : CoroutineVerticle() {
     val result = jsonObjectOf("music" to tracks)
 
     routingContext.json(result)
+  }
+
+  private companion object {
+    const val query = "SELECT title,album,artist,genre,source,duration,image FROM tracks"
   }
 }
