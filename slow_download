@@ -1,0 +1,6 @@
+curl \
+  --limit-rate 28K \
+  http://localhost:8080/media/Behind_Closed_Doors.mp3 \
+  --output /dev/null
+
+for i in {1..100}; do curl --limit-rate 28K http://localhost:8080/media/Behind_Closed_Doors.mp3 --output /dev/null > /dev/null 2>&1 & done
