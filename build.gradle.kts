@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("jvm") version "1.3.60"
   id("io.vertx.vertx-plugin") version "1.0.1"
+  id("com.google.cloud.tools.jib") version "1.8.0"
 }
 
 repositories {
@@ -24,7 +25,10 @@ dependencies {
   testImplementation("io.vertx:vertx-web-client")
 }
 
+val launcher_class = "io.vertx.core.Launcher"
+
 vertx {
+  launcher = launcher_class
   vertxVersion = "3.8.4"
   mainVerticle = "sample.App"
 }
@@ -35,4 +39,15 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
   useJUnitPlatform()
+}
+
+jib {
+  container {
+    mainClass = launcher_class
+    ports = listOf("8080")
+    args = listOf(
+        "run",
+        "sample.App"
+    )
+  }
 }
