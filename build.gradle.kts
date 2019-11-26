@@ -15,7 +15,7 @@ dependencies {
   implementation("io.vertx:vertx-lang-kotlin")
   implementation("io.vertx:vertx-lang-kotlin-coroutines")
   implementation("io.vertx:vertx-web")
-  implementation("io.reactiverse:reactive-pg-client:0.11.4")
+  implementation("io.vertx:vertx-pg-client")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
   testImplementation("org.testcontainers:postgresql:1.11.3")
@@ -25,7 +25,7 @@ dependencies {
 }
 
 vertx {
-  vertxVersion = "3.7.1"
+  vertxVersion = "3.8.4"
   mainVerticle = "sample.App"
 }
 

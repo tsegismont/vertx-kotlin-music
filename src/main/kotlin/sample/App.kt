@@ -1,8 +1,5 @@
 package sample
 
-import io.reactiverse.kotlin.pgclient.queryAwait
-import io.reactiverse.pgclient.PgClient
-import io.reactiverse.pgclient.PgPool
 import io.vertx.core.json.JsonArray
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
@@ -11,6 +8,9 @@ import io.vertx.ext.web.handler.StaticHandler
 import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.core.json.jsonObjectOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
+import io.vertx.kotlin.sqlclient.queryAwait
+import io.vertx.pgclient.PgPool
+import io.vertx.sqlclient.PoolOptions
 import kotlinx.coroutines.launch
 
 class App : CoroutineVerticle() {
@@ -18,7 +18,7 @@ class App : CoroutineVerticle() {
   private lateinit var pgClient: PgPool
 
   override suspend fun start() {
-    pgClient = PgClient.pool(vertx, pgPoolOptions(config))
+    pgClient = PgPool.pool(vertx, pgConnectOptions(config), PoolOptions())
 
     val router = Router.router(vertx)
 

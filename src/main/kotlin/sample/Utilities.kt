@@ -1,13 +1,13 @@
 package sample
 
-import io.reactiverse.kotlin.pgclient.pgPoolOptionsOf
-import io.reactiverse.pgclient.PgPoolOptions
-import io.reactiverse.pgclient.Row
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.jsonObjectOf
+import io.vertx.kotlin.pgclient.pgConnectOptionsOf
+import io.vertx.pgclient.PgConnectOptions
+import io.vertx.sqlclient.Row
 
-internal fun pgPoolOptions(config: JsonObject): PgPoolOptions = pgPoolOptionsOf(
+internal fun pgConnectOptions(config: JsonObject): PgConnectOptions = pgConnectOptionsOf(
   port = config.getInteger("postgresPort", 5432),
   user = "music",
   password = "music",
