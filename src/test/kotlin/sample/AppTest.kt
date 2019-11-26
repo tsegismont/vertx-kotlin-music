@@ -40,7 +40,7 @@ internal class AppTest {
   }
 
   @Test
-  internal fun `service should list of tracks`(testContext: VertxTestContext) {
+  internal fun `service should return list of tracks`(testContext: VertxTestContext) {
     webClient.get("/music.json")
       .`as`(BodyCodec.jsonObject())
       .expect(ResponsePredicate.SC_OK)
