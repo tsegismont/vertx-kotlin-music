@@ -18,6 +18,8 @@ dependencies {
   implementation("io.vertx:vertx-web")
   implementation("io.vertx:vertx-pg-client")
 
+  implementation("ch.qos.logback:logback-classic:1.2.3")
+
   testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
   testImplementation("org.testcontainers:postgresql:1.11.3")
   testImplementation("org.slf4j:slf4j-jdk14:1.7.26")
@@ -26,11 +28,13 @@ dependencies {
 }
 
 val launcher_class = "io.vertx.core.Launcher"
+val jvm_flags = listOf("-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory")
 
 vertx {
-  launcher = launcher_class
   vertxVersion = "3.8.4"
+  launcher = launcher_class
   mainVerticle = "sample.App"
+  jvmArgs = jvm_flags
 }
 
 tasks.withType<KotlinCompile> {
@@ -49,5 +53,6 @@ jib {
         "run",
         "sample.App"
     )
+    jvmFlags = jvm_flags
   }
 }
