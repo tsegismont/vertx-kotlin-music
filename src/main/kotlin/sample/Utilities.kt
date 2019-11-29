@@ -1,21 +1,31 @@
 package sample
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.core.json.jsonObjectOf
-import io.vertx.kotlin.pgclient.pgConnectOptionsOf
-import io.vertx.pgclient.PgConnectOptions
-import io.vertx.sqlclient.Row
+import javax.sql.DataSource
 
-internal fun pgConnectOptions(config: JsonObject): PgConnectOptions = pgConnectOptionsOf(
-  port = config.getInteger("postgresPort", 5432),
-  user = "music",
-  password = "music",
-  database = "musicdb",
-  host = if (System.getenv("CLOUD_SQL_INSTANCE") != null) "/cloudsql/" + System.getenv("CLOUD_SQL_INSTANCE") else null
-)
+internal fun jdbcClientDatasource(config: JsonObject): DataSource {
+  val hikariConfig = HikariConfig()
 
-internal fun rowToJsonObject(row: Row) = jsonObjectOf(
+  val cloudSqlInstance = System.getenv("CLOUD_SQL_INSTANCE")
+  val port = config.getInteger("postgresPort", 5432)
+
+  hikariConfig.jdbcUrl = if (cloudSqlInstance == null) "jdbc:postgresql://localhost:${port}/musicdb" else "jdbc:postgresql:///musicdb"
+  hikariConfig.username = "music"
+  hikariConfig.password = "music"
+
+  if (cloudSqlInstance != null) {
+    hikariConfig.addDataSourceProperty("socketFactory", "com.google.cloud.sql.postgres.SocketFactory")
+    hikariConfig.addDataSourceProperty("cloudSqlInstance", cloudSqlInstance)
+  }
+
+  return HikariDataSource(hikariConfig)
+}
+
+internal fun rowToJsonObject(row: JsonObject) = jsonObjectOf(
   "title" to row.getString("title"),
   "album" to row.getString("album"),
   "artist" to row.getString("artist"),

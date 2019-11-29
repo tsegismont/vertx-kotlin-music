@@ -16,15 +16,18 @@ dependencies {
   implementation("io.vertx:vertx-lang-kotlin")
   implementation("io.vertx:vertx-lang-kotlin-coroutines")
   implementation("io.vertx:vertx-web")
-  implementation("io.vertx:vertx-pg-client")
+  implementation("io.vertx:vertx-jdbc-client") {
+    exclude("com.mchange")
+  }
 
-  implementation("io.netty:netty-transport-native-epoll:4.1.42.Final:linux-x86_64")
+  implementation("org.postgresql:postgresql:42.2.8")
+  implementation("com.zaxxer:HikariCP:3.4.1")
+  implementation("com.google.cloud.sql:postgres-socket-factory:1.0.15")
 
   implementation("ch.qos.logback:logback-classic:1.2.3")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
   testImplementation("org.testcontainers:postgresql:1.11.3")
-  testImplementation("org.slf4j:slf4j-jdk14:1.7.26")
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("io.vertx:vertx-web-client")
 }

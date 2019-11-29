@@ -1,6 +1,7 @@
 package sample
 
 import io.vertx.core.json.JsonArray
+import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.LoggerHandler
@@ -8,18 +9,16 @@ import io.vertx.ext.web.handler.StaticHandler
 import io.vertx.kotlin.core.http.listenAwait
 import io.vertx.kotlin.core.json.jsonObjectOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
-import io.vertx.kotlin.sqlclient.queryAwait
-import io.vertx.pgclient.PgPool
-import io.vertx.sqlclient.PoolOptions
+import io.vertx.kotlin.ext.sql.queryAwait
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 class App : CoroutineVerticle() {
 
-  private lateinit var pgClient: PgPool
+  private lateinit var sqlClient: JDBCClient
 
   override suspend fun start() {
-    pgClient = PgPool.pool(vertx, pgConnectOptions(config), PoolOptions())
+    sqlClient = JDBCClient.create(vertx, jdbcClientDatasource(config));
 
     val router = Router.router(vertx)
 
@@ -35,11 +34,11 @@ class App : CoroutineVerticle() {
   }
 
   private suspend fun listTracks(routingContext: RoutingContext) {
-    val pgRowSet = pgClient.queryAwait(query)
+    val resultSet = sqlClient.queryAwait(query)
 
     val tracks = JsonArray()
 
-    pgRowSet.forEach {
+    resultSet.rows.forEach {
       val track = rowToJsonObject(it)
       tracks.add(track)
     }
