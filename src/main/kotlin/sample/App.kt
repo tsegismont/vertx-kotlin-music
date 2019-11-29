@@ -12,6 +12,7 @@ import io.vertx.kotlin.sqlclient.queryAwait
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.PoolOptions
 import kotlinx.coroutines.launch
+import org.slf4j.LoggerFactory
 
 class App : CoroutineVerticle() {
 
@@ -29,6 +30,8 @@ class App : CoroutineVerticle() {
     vertx.createHttpServer()
       .requestHandler(router)
       .listenAwait(8080)
+
+    log.info("App is ready!")
   }
 
   private suspend fun listTracks(routingContext: RoutingContext) {
@@ -48,5 +51,6 @@ class App : CoroutineVerticle() {
 
   private companion object {
     const val query = "SELECT title,album,artist,genre,source,duration,image FROM tracks"
+    val log = LoggerFactory.getLogger("app")
   }
 }

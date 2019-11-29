@@ -11,7 +11,8 @@ internal fun pgConnectOptions(config: JsonObject): PgConnectOptions = pgConnectO
   port = config.getInteger("postgresPort", 5432),
   user = "music",
   password = "music",
-  database = "musicdb"
+  database = "musicdb",
+  host = if (System.getenv("CLOUD_SQL_INSTANCE") != null) "/cloudsql/" + System.getenv("CLOUD_SQL_INSTANCE") else null
 )
 
 internal fun rowToJsonObject(row: Row) = jsonObjectOf(

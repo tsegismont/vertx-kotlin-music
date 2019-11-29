@@ -18,6 +18,8 @@ dependencies {
   implementation("io.vertx:vertx-web")
   implementation("io.vertx:vertx-pg-client")
 
+  implementation("io.netty:netty-transport-native-epoll:4.1.42.Final:linux-x86_64")
+
   implementation("ch.qos.logback:logback-classic:1.2.3")
 
   testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
@@ -27,7 +29,7 @@ dependencies {
   testImplementation("io.vertx:vertx-web-client")
 }
 
-val launcher_class = "io.vertx.core.Launcher"
+val launcher_class = "sample.Main"
 val jvm_flags = listOf("-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory")
 
 vertx {
@@ -49,10 +51,6 @@ jib {
   container {
     mainClass = launcher_class
     ports = listOf("8080")
-    args = listOf(
-        "run",
-        "sample.App"
-    )
     jvmFlags = jvm_flags
   }
 }
