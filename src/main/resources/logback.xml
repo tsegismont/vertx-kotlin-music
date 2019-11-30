@@ -7,6 +7,7 @@
   </appender>
 
   <logger name="io.vertx" level="info"/>
+  <logger name="io.vertx.core.net.impl.ConnectionBase" level="fatal"/>
   <logger name="io.netty" level="warn"/>
   <logger name="io.netty.handler.logging.LoggingHandler" level="warn"/>
 

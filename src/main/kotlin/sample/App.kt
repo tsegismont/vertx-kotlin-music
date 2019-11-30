@@ -49,7 +49,7 @@ class App : CoroutineVerticle() {
   }
 
   private companion object {
-    const val query = "SELECT title,album,artist,genre,source,duration,image FROM tracks"
+    const val query = "SELECT id,title,album,artist,genre,source,image,track_number,total_track_count,duration FROM tracks"
     val log = LoggerFactory.getLogger("app")
   }
 }

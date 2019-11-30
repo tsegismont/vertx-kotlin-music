@@ -26,15 +26,16 @@ internal fun jdbcClientDatasource(config: JsonObject): DataSource {
 }
 
 internal fun rowToJsonObject(row: JsonObject) = jsonObjectOf(
+  "id" to row.getString("id"),
   "title" to row.getString("title"),
   "album" to row.getString("album"),
   "artist" to row.getString("artist"),
   "genre" to row.getString("genre"),
   "source" to row.getString("source"),
-  "duration" to row.getInteger("duration"),
   "image" to row.getString("image"),
-  "trackNumber" to 0,
-  "totalTrackCount" to 0
+  "trackNumber" to row.getInteger("track_number"),
+  "totalTrackCount" to row.getInteger("total_track_count"),
+  "duration" to row.getInteger("duration")
 )
 
 internal fun RoutingContext.json(json: JsonObject) =
