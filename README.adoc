@@ -6,7 +6,6 @@ It serves as a backend for the https://github.com/googlesamples/android-Universa
 
 * create a web server
 * interact with a relational database
-* transform data streams with https://github.com/ReactiveX/RxJava[RxJava]
 * stream files from the disk
 
 == Running
