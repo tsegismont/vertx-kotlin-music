@@ -1,4 +1,4 @@
-package sample
+package io.github.tsegismont.vkm
 
 import io.vertx.core.json.JsonArray
 import io.vertx.ext.jdbc.JDBCClient

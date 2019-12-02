@@ -1,4 +1,4 @@
-package sample
+package io.github.tsegismont.vkm
 
 import io.vertx.core.Vertx
 
