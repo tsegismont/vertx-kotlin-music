@@ -23,7 +23,8 @@ import java.nio.file.Paths
 internal class AppTest {
 
   @Rule
-  var postgres: KGenericContainer = KGenericContainer(ImageFromDockerfile().withFileFromPath(".", Paths.get("postgres")))
+  var postgres: KGenericContainer = KGenericContainer(ImageFromDockerfile()
+    .withFileFromPath(".", Paths.get("..", "postgres")))
     .withExposedPorts(5432)
 
   private lateinit var webClient: WebClient
