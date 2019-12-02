@@ -1,13 +1,11 @@
 package io.github.tsegismont.vkm
 
-import io.vertx.core.json.JsonArray
 import io.vertx.ext.jdbc.JDBCClient
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.LoggerHandler
 import io.vertx.ext.web.handler.StaticHandler
 import io.vertx.kotlin.core.http.listenAwait
-import io.vertx.kotlin.core.json.jsonObjectOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.ext.sql.queryAwait
 import kotlinx.coroutines.launch
@@ -36,14 +34,9 @@ class App : CoroutineVerticle() {
   private suspend fun listTracks(routingContext: RoutingContext) {
     val resultSet = sqlClient.queryAwait(query)
 
-    val tracks = JsonArray()
+    val tracks = resultSet.rows.map { rowToTrack(it) }
 
-    resultSet.rows.forEach {
-      val track = rowToJsonObject(it)
-      tracks.add(track)
-    }
-
-    val result = jsonObjectOf("music" to tracks)
+    val result = Music(tracks)
 
     routingContext.json(result)
   }

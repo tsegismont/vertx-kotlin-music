@@ -2,9 +2,9 @@ package io.github.tsegismont.vkm
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
-import io.vertx.kotlin.core.json.jsonObjectOf
 import javax.sql.DataSource
 
 internal fun jdbcClientDatasource(config: JsonObject): DataSource {
@@ -25,18 +25,18 @@ internal fun jdbcClientDatasource(config: JsonObject): DataSource {
   return HikariDataSource(hikariConfig)
 }
 
-internal fun rowToJsonObject(row: JsonObject) = jsonObjectOf(
-  "id" to row.getString("id"),
-  "title" to row.getString("title"),
-  "album" to row.getString("album"),
-  "artist" to row.getString("artist"),
-  "genre" to row.getString("genre"),
-  "source" to row.getString("source"),
-  "image" to row.getString("image"),
-  "trackNumber" to row.getInteger("track_number"),
-  "totalTrackCount" to row.getInteger("total_track_count"),
-  "duration" to row.getInteger("duration")
+internal fun rowToTrack(row: JsonObject) = Track(
+  id = row.getString("id"),
+  title = row.getString("title"),
+  album = row.getString("album"),
+  artist = row.getString("artist"),
+  genre = row.getString("genre"),
+  source = row.getString("source"),
+  image = row.getString("image"),
+  trackNumber = row.getInteger("track_number"),
+  totalTrackCount = row.getInteger("total_track_count"),
+  duration = row.getInteger("duration")
 )
 
-internal fun RoutingContext.json(json: JsonObject) =
-  this.response().putHeader("Content-Type", "application/json").end(json.encode())
+internal fun RoutingContext.json(data: Any) =
+  this.response().putHeader("Content-Type", "application/json").end(Json.encodeToBuffer(data))
