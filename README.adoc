@@ -14,20 +14,19 @@ It serves as a backend for the https://github.com/googlesamples/android-Universa
 
 With Docker:
 
-[source,bash]
+[source,shell]
 ----
 cd postgres
-docker build -t vertx-kotlin-music/postgres .
-docker run --network host -it vertx-kotlin-music/postgres
+./run-postgres.sh
 ----
 
 === The server-side app
 
 Download or fork this repository, open it in a terminal and then run:
 
-[source,bash]
+[source,shell]
 ----
-./gradlew vertxRun
+./gradlew web:vertxRun
 ----
 
 The server starts listening on port `8080`.
@@ -36,18 +35,30 @@ The server starts listening on port `8080`.
 
 Clone this https://github.com/tsegismont/android-UniversalMusicPlayer[fork] of the https://github.com/googlesamples/android-UniversalMusicPlayer[Universal Android Music Player Sample] and checkout the `vertx-kotlin-music` branch:
 
-[source,bash]
+[source,shell]
 ----
 git clone https://github.com/tsegismont/android-UniversalMusicPlayer.git
 cd android-UniversalMusicPlayer
 git checkout vertx-kotlin-music
 ----
 
-This branch modifies `mobile/src/main/java/com/example/android/uamp/model/RemoteJSONSource.java` so that the `CATALOG_URL` points to `http://10.0.2.2:8080/music.json`.footnote:[`10.0.2.2` is a special IP address that the emulator uses to communicate with the host through its loopback interface.]
+This branch modifies the code so that:
+
+- the catalog is loaded from `http://10.0.2.2:8080/music.json`
+- the data classes are shared with the web application.
+
+IMPORTANT: Do not forget to put the shared classes in your local Maven repo before importing the project in Android Studio.
+
+To do so, open a Terminal in the backend project directory and run:
+
+[source,shell]
+----
+./publish-to-mvn-local.sh
+----
 
 Then open https://developer.android.com/studio/index.html[Android Studio] and import the project.
 
-Finally, https://developer.android.com/studio/run/managing-avds.html[create or reuse a virtual device] to deploy.
+Finally, https://developer.android.com/studio/run/managing-avds.html[create or reuse a virtual device] to deploy the mobile app.
 
 == Audio files
 
