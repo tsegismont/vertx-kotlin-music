@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   kotlin("jvm")
-  id("io.vertx.vertx-plugin") version "1.0.1"
-  id("com.google.cloud.tools.jib") version "1.8.0"
+  id("io.vertx.vertx-plugin")
+  id("com.google.cloud.tools.jib")
 }
 
 dependencies {
